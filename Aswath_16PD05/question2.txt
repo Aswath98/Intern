@@ -1,0 +1,109 @@
+import pandas as pd
+import sqlite3
+db = sqlite3.connect("test.db")
+df1= pd.read_excel('Customer_Demographics.xlsx',header=0)
+df2= pd.read_excel('Customer_Transaction.xlsx',header=0)
+df3= pd.read_excel('Store_Master.xlsx',header=0)
+#customerTrans = pandas.read_excel("F:\\rao\\Customer Data\\Customer_Transaction.xlsx")
+#storeMaster = pandas.read_excel("F:\\rao\\Customer Data\\Store_Master.xlsx")
+
+db.execute(
+        '''CREATE TABLE cd( Customer_ID int,
+        Territory text,
+        Nationality text,
+        Income_Range text,
+        Job_Type text,
+        Marital_Status text,
+        Gender text,
+        State text,
+        Language text,
+        Loyalty_Status text,
+        Birth_date text,
+        Age int,
+        Points real,
+        First_txn_dt text,
+        Last_accr_txn_dt text,
+        Last_rdm_txn_dt text)'''
+    )
+
+db.execute(
+        '''create table FIRST(
+            Territory text,
+            Business text,
+            Year int,
+            Week int,
+            Store_Code int,
+            City_Name text,
+            Store_Type text,
+            Transaction_Type text,
+            Return_Reason text,
+            Customer_ID int,
+            Invoices int,
+            Item_Count int,
+            Revenue real,
+            Discount real,
+            Units_Sold int
+        )'''
+    )
+
+db.execute(
+        '''create table sm(
+            Territory text,
+            Business text,
+            Region text,
+            Region_Code int,
+            Store_Code int,
+            Store_Name text,
+            Mall_Name text,
+            Store_Format text,
+            Sales_Per_Day real,
+            Store_Launch_Date text,
+            Train_Test_Store text,
+            Geo_Field text,
+            Store_Size_Sq_Ft real,
+            Customer_Count int,
+            Total_Revenue real
+        )'''
+    )
+        
+def cdfoo(row):
+    s="("
+    for i in row:
+        if type(i)!=type("hi"):
+            s+=str(i)+","
+        else:
+            s+="'"+i+"',"
+    return s[:-1]+")"
+
+iquery = '''insert into cd(
+            Customer_ID ,
+            Territory ,
+            Nationality ,
+            Income_Range ,
+            Job_Type ,
+            Marital_Status ,
+            Gender,
+            State ,
+            Language,
+            Loyalty_Status,
+            Birth_date,
+            Age ,
+            Points,
+            First_txn_dt ,
+            Last_accr_txn_dt ,
+            Last_rdm_txn_dt
+        )  values'''
+
+
+
+
+1. select a.*,b.Store_Code from FIRST a, (select count(*),Customer_ID, Store_Code from FIRST  group by (Store_Code, Customer_ID) having count(*)>=10) b where a.Customer_ID=b.Customer_ID
+
+2. select Customer_ID, RANK() OVER(ORDER BY freq desc) as rank from (select Customer_ID, count(*) as freq from FIRST group by Customer_ID order by count(*) desc)
+
+3. SELECT cd.Customer_ID, FIRST.Store_Code
+FROM ((cd
+INNER JOIN FIRST ON cd.Customer_ID = FIRST.Customer_ID)
+INNER JOIN sm ON FIRST.Store_Code = sm.Store_Code);
+
+
